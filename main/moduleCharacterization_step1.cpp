@@ -296,6 +296,7 @@ int main(int argc, char** argv)
         float vth1 = float(int(step2/10000)-1);
         float vth2 = float(int((step2-10000*(vth1+1))/100.)-1);
         float vth = 0.;
+	if(!opts.GetOpt<std::string>("Input.vth").compare("vth12")) { vth = vth1*100+vth2;}
 	if(!opts.GetOpt<std::string>("Input.vth").compare("vth1"))  { vth = vth1;}
 	if(!opts.GetOpt<std::string>("Input.vth").compare("vth2"))  { vth = vth2;}
 
@@ -365,14 +366,14 @@ int main(int argc, char** argv)
 	energyL_ext = (*energy)[channelIdx[chL_ext]];
 	energyR_ext = (*energy)[channelIdx[chR_ext]];
 	
-	int index( (10000*int(Vov*100.)) + (100*vth) + 99 );
+	int index( (1000000*int(Vov*100.)) + (100*vth) + 99 );
 	
 	//--- create histograms, if needed
 	if( h1_energyLR_ext[index] == NULL ){
-	  c[index] = new TCanvas(Form("c1_Vov%.2f_th%02.0f",Vov,vth), Form("c1_Vov%.2f_th%02.0f",Vov,vth));
+	  c[index] = new TCanvas(Form("c1_Vov%.2f_th%04.0f",Vov,vth), Form("c1_Vov%.2f_th%04.0f",Vov,vth));
 	  c[index] -> cd();
 	  c[index] ->SetLogy();
-	  h1_energyLR_ext[index] = new TH1F(Form("h1_energy_external_barL-R_Vov%.2f_th%02.0f",Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
+	  h1_energyLR_ext[index] = new TH1F(Form("h1_energy_external_barL-R_Vov%.2f_th%04.0f",Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
 	}
 	
 	acceptEvent[entry] = true;
@@ -401,12 +402,10 @@ int main(int argc, char** argv)
 	  rangesLR[index.first] = new std::vector<float>;
 
 
-	  float Vov = float ((int(index.first /10000))/100.);
-	  float vth1 = float(int((index.first-Vov*10000*100)/100.));
-	  float vth2 = float(int((step2-10000*(vth1+1))/100.)-1);
-          float vth = 0;
-          if(!opts.GetOpt<std::string>("Input.vth").compare("vth1"))  { vth = vth1;}
-          if(!opts.GetOpt<std::string>("Input.vth").compare("vth2"))  { vth = vth2;}
+	  float Vov = float ((int(index.first /1000000))/100.);
+          float vth = float(int((index.first-Vov*1000000*100)/100.));
+          float vth1 = float(int(vth/100.));
+          float vth2 = vth-vth1*100.;
 	  
 	  if( opts.GetOpt<int>("Channels.array") == 0){
 	    //	    index.second->GetXaxis()->SetRangeUser(50,900);
@@ -419,7 +418,7 @@ int main(int argc, char** argv)
 	  float max = index.second->GetBinCenter(index.second->GetMaximumBin());
 	  index.second->GetXaxis()->SetRangeUser(0,1024);
 	  
-	  TF1* f_pre = new TF1(Form("fit_energy_coincBar_Vov%.2f_vth1_%02.0f",Vov,vth), "[0]*TMath::Landau(x,[1],[2])", 0, 1000.); 
+	  TF1* f_pre = new TF1(Form("fit_energy_coincBar_Vov%.2f_th%04.0f",Vov,vth), "[0]*TMath::Landau(x,[1],[2])", 0, 1000.); 
 	  f_pre -> SetRange(max*0.70, max*1.5);
 	  f_pre -> SetLineColor(kBlack);
           f_pre -> SetLineWidth(2);
@@ -479,6 +478,7 @@ int main(int argc, char** argv)
     float vth2 = int((step2-10000*(vth1+1))/100.)-1;
     float vth = 0;
     std::string vthMode = opts.GetOpt<std::string>("Input.vth");
+    if(!opts.GetOpt<std::string>("Input.vth").compare("vth12")) { vth = vth1*100+vth2;}
     if(!opts.GetOpt<std::string>("Input.vth").compare("vth1"))  { vth = vth1;}
     if(!opts.GetOpt<std::string>("Input.vth").compare("vth2"))  { vth = vth2;}
     // float vthe = float(int((step2-10000*vth1-step2-100*vth2)/1)-1);
@@ -497,7 +497,7 @@ int main(int argc, char** argv)
 	float energyL_ext = (*energy)[channelIdx[chL_ext]];
 	float energyR_ext = (*energy)[channelIdx[chR_ext]];
 	
-	int label = (10000*int(Vov*100.)) + (100*vth) + 99;
+	int label = (1000000*int(Vov*100.)) + (100*vth) + 99;
 	int eBin = opts.GetOpt<int>("Coincidence.peak511eBin");
 	float avEn = 0.5 * ( energyL_ext + energyR_ext);
 	if ( (!opts.GetOpt<std::string>("Input.sourceName").compare("Na22SingleBar") || !opts.GetOpt<std::string>("Input.sourceName").compare("Na22")) &&  avEn > rangesLR[label]-> at(eBin)) {
@@ -589,25 +589,25 @@ int main(int argc, char** argv)
       {
         if (totL[iBar]>-10 && totR[iBar]>-10 && totL[iBar]<100 && totR[iBar]<100){  
     
-	int index( (10000*int(Vov*100.)) + (100*vth) + iBar );
+	int index( (1000000*int(Vov*100.)) + (100*vth) + iBar );
 	
 	
 	//--- create histograms, if needed
 	if( h1_totL[index] == NULL )
 	{
-	  h1_qfineL[index] = new TH1F(Form("h1_qfine_bar%02dL_Vov%.2f_th%02.0f",iBar,Vov,vth),"",512,-0.5,511.5);
-	  h1_qfineR[index] = new TH1F(Form("h1_qfine_bar%02dR_Vov%.2f_th%02.0f",iBar,Vov,vth),"",512,-0.5,511.5);
+	  h1_qfineL[index] = new TH1F(Form("h1_qfine_bar%02dL_Vov%.2f_th%04.0f",iBar,Vov,vth),"",512,-0.5,511.5);
+	  h1_qfineR[index] = new TH1F(Form("h1_qfine_bar%02dR_Vov%.2f_th%04.0f",iBar,Vov,vth),"",512,-0.5,511.5);
 	  
-	  h1_totL[index] = new TH1F(Form("h1_tot_bar%02dL_Vov%.2f_th%02.0f",iBar,Vov,vth),"",400,-5.,35.);
-	  h1_totR[index] = new TH1F(Form("h1_tot_bar%02dR_Vov%.2f_th%02.0f",iBar,Vov,vth),"",400,-5.,35.);
+	  h1_totL[index] = new TH1F(Form("h1_tot_bar%02dL_Vov%.2f_th%04.0f",iBar,Vov,vth),"",400,-5.,35.);
+	  h1_totR[index] = new TH1F(Form("h1_tot_bar%02dR_Vov%.2f_th%04.0f",iBar,Vov,vth),"",400,-5.,35.);
 	  
-	  h1_energyL[index] = new TH1F(Form("h1_energy_bar%02dL_Vov%.2f_th%02.0f",iBar,Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
-	  h1_energyR[index] = new TH1F(Form("h1_energy_bar%02dR_Vov%.2f_th%02.0f",iBar,Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
+	  h1_energyL[index] = new TH1F(Form("h1_energy_bar%02dL_Vov%.2f_th%04.0f",iBar,Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
+	  h1_energyR[index] = new TH1F(Form("h1_energy_bar%02dR_Vov%.2f_th%04.0f",iBar,Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
 	  
-	  outTrees[index] = new TTree(Form("data_bar%02dL-R_Vov%.2f_th%02.0f",iBar,Vov,vth),Form("data_bar%02dL-R_Vov%.2f_th%02.0f",iBar,Vov,vth));
+	  outTrees[index] = new TTree(Form("data_bar%02dL-R_Vov%.2f_th%04.0f",iBar,Vov,vth),Form("data_bar%02dL-R_Vov%.2f_th%04.0f",iBar,Vov,vth));
 	  outTrees[index] -> Branch("event",&anEvent);
 	  
-	  h1_energyLR[index] = new TH1F(Form("h1_energy_bar%02dL-R_Vov%.2f_th%02.0f",iBar,Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
+	  h1_energyLR[index] = new TH1F(Form("h1_energy_bar%02dL-R_Vov%.2f_th%04.0f",iBar,Vov,vth),"",map_energyBins[Vov],map_energyMins[Vov],map_energyMaxs[Vov]);
 	}
       
 	
@@ -619,8 +619,8 @@ int main(int argc, char** argv)
 	  {
 	  if( totL[iBar] <= -10. || totR[iBar] <= -10. ) continue;
 	  if( totL[iBar] >= 50. ||  totR[iBar] >= 50.) continue;
-	  if( ( thrZero.GetThresholdZero(chL[iBar],vthMode) + vth) > 63. ) continue;
-          if( ( thrZero.GetThresholdZero(chR[iBar],vthMode) + vth) > 63. ) continue;
+	  // if( ( thrZero.GetThresholdZero(chL[iBar],vthMode) + vth) > 63. ) continue;
+          // if( ( thrZero.GetThresholdZero(chR[iBar],vthMode) + vth) > 63. ) continue;
 
 	  //if (!opts.GetOpt<std::string>("Input.sourceName").compare("TB") && (energySumArray > 900 || nActiveBarsArray > 5)) continue; // to remove showering events
 	  //if (!opts.GetOpt<std::string>("Input.sourceName").compare("TB") && (vetoOtherBars && nBarsVeto[iBar] > 0)) continue; // to remove showering events/ cross talk
@@ -673,12 +673,12 @@ int main(int argc, char** argv)
 	!opts.GetOpt<std::string>("Input.sourceName").compare("Laser") ||
 	!opts.GetOpt<std::string>("Input.sourceName").compare("keepAll") )
       {
-	int index( (10000*int(Vov*100.)) + (100*vth) + maxBar );
+	int index( (1000000*int(Vov*100.)) + (100*vth) + maxBar );
 	
 	if( totL[maxBar] <= -10. || totR[maxBar] <= -10. ) continue;
 	if( totL[maxBar] >= 50. ||  totR[maxBar] >= 50.) continue;
-	if( ( thrZero.GetThresholdZero(chL[maxBar],vthMode) + vth) > 63. ) continue;
-        if( ( thrZero.GetThresholdZero(chR[maxBar],vthMode) + vth) > 63. ) continue;
+	// if( ( thrZero.GetThresholdZero(chL[maxBar],vthMode) + vth) > 63. ) continue;
+        // if( ( thrZero.GetThresholdZero(chR[maxBar],vthMode) + vth) > 63. ) continue;
 	
 	//--- fill histograms
 	h1_qfineL[index] -> Fill( qfineL[maxBar] );
