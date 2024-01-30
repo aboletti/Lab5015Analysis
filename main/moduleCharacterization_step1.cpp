@@ -366,7 +366,7 @@ int main(int argc, char** argv)
 	energyL_ext = (*energy)[channelIdx[chL_ext]];
 	energyR_ext = (*energy)[channelIdx[chR_ext]];
 	
-	int index( (1000000*int(Vov*100.)) + (100*vth) + 99 );
+	int index( (1000000*int(Vov*100.)) + int(100*vth) + 99 );
 	
 	//--- create histograms, if needed
 	if( h1_energyLR_ext[index] == NULL ){
@@ -497,7 +497,7 @@ int main(int argc, char** argv)
 	float energyL_ext = (*energy)[channelIdx[chL_ext]];
 	float energyR_ext = (*energy)[channelIdx[chR_ext]];
 	
-	int label = (1000000*int(Vov*100.)) + (100*vth) + 99;
+	int label = (1000000*int(Vov*100.)) + int(100*vth) + 99;
 	int eBin = opts.GetOpt<int>("Coincidence.peak511eBin");
 	float avEn = 0.5 * ( energyL_ext + energyR_ext);
 	if ( (!opts.GetOpt<std::string>("Input.sourceName").compare("Na22SingleBar") || !opts.GetOpt<std::string>("Input.sourceName").compare("Na22")) &&  avEn > rangesLR[label]-> at(eBin)) {
@@ -589,7 +589,7 @@ int main(int argc, char** argv)
       {
         if (totL[iBar]>-10 && totR[iBar]>-10 && totL[iBar]<100 && totR[iBar]<100){  
     
-	int index( (1000000*int(Vov*100.)) + (100*vth) + iBar );
+	int index( (1000000*int(Vov*100.)) + int(100*vth) + iBar );
 	
 	
 	//--- create histograms, if needed
@@ -673,7 +673,7 @@ int main(int argc, char** argv)
 	!opts.GetOpt<std::string>("Input.sourceName").compare("Laser") ||
 	!opts.GetOpt<std::string>("Input.sourceName").compare("keepAll") )
       {
-	int index( (1000000*int(Vov*100.)) + (100*vth) + maxBar );
+	int index( (1000000*int(Vov*100.)) + int(100*vth) + maxBar );
 	
 	if( totL[maxBar] <= -10. || totR[maxBar] <= -10. ) continue;
 	if( totL[maxBar] >= 50. ||  totR[maxBar] >= 50.) continue;
